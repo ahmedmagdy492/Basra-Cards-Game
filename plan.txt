@@ -1,0 +1,78 @@
+-shuffle the cards in the pile
+-disteribute 4 cards to each player
+-put 4 cards on the ground
+-start player 1 turn
+-the player can choose any card to play
+  - if the card value = the sum of some/all cards on the ground: 
+    - all the cards will be added to the player pocket
+  - otherwise the card will be added to the ground
+-then it's the computer's turn
+-the computer will make a decesioin based on the following rules:
+  -if he has 7 diamond he will pick all the cards on the ground
+  -if he has a boy he will also pick all the cards on the ground
+  -in both of the above cases the cards will be added to the computer pocket
+-if there are no cards left in the pile:
+  -the player whose turn will pick whatever left on the ground to be added to his pocket
+-if the 2 players has no more cards and the pile still contains cards: 
+  -distribute 4 cards to each player
+-if the 2 players has no more cards and the pile does not contain any cards
+  -it's time to count each one's pocket
+  -and then start a new game (for now and will be changed later)
+
+Objects:
+Card:
+-value: int
+-type: [blackheart, redheart, diamond, tree, boy, queen, king]
+-image
+-on click:
+ -check if the card is a basra or there is a match with grounds cards
+   - add all the cards to the player's pocket
+   - change player turn
+ -otherwise add the card to the ground
+ -if the current player has no cards and the other player has no cards and no cards in the pile:
+   - add the cards left on the ground to the current player's pocket
+   - count the cards in each player pocket
+   - determine who won this round
+   - restart the game
+ -if both the current player and the other player has no cards: 
+   - add cards to both player1 and computer cur_set
+   - change player turn
+
+Player:
+-pocket: stack of cards
+-cur_set: array of cards
+-score: int
+-basras_count: int
+
+Globals:
+Pile: stack of cards
+Ground: array of cards at most with 10 elements
+current_turn: int 0 -> player1, 1 -> computer
+is_playing: int
+
+-on current turn is computer:
+ -check if the card is a basra or there is a match with grounds cards
+   - add all the cards to the player's pocket
+   - change player turn
+ -otherwise add the card to the ground
+ -if the current player has no cards and the other player has no cards and no cards in the pile:
+   - add the cards left on the ground to the current player's pocket
+   - count the cards in each player pocket
+   - determine who won this round
+   - restart the game
+ -if both the current player and the other player has no cards: 
+   - add cards to both player1 and computer cur_set
+   - change player turn
+
+-on init:
+ -create the pile
+ -create the players objects
+ -set is playing to 1
+ -set current player turn to player1
+ -start adding cards to player1 and computer
+ -give control to player1
+
+-in main loop:
+ -start drawing player1 cards
+ -start drawing ground cards
+
