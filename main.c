@@ -65,12 +65,12 @@ void DrawGameText()
   if (current_player == 0)
   {
     // player1
-    DrawText("Player1", 5, 5, 13, WHITE);
+    DrawText("Turn: Player1", 5, 5, 20, WHITE);
   }
   else
   {
     // computer
-    DrawText("Computer", 5, 5, 13, WHITE);
+    DrawText("Turn: Computer", 5, 5, 20, WHITE);
   }
 
   // drawing pocket count
@@ -107,7 +107,7 @@ void Init()
 {
   pile.top = 0;
   CreateThePile(&pile);
-  // ShuffleThePile(&pile);
+  ShuffleThePile(&pile);
 
   // creating the players
   player1.score = computer.score = 0;
