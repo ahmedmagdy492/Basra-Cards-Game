@@ -15,7 +15,8 @@ enum GameRules {
 typedef enum GameRules GameRules;
 
 GameRules DetermineGameRule(LinkedList* ground, Player* player, Card* ground_card, Card* card) {
-  if(CountLL(ground) == 0) {
+  int ground_count = 0;
+  if((ground_count = CountLL(ground)) == 0) {
     return NoMatch;
   }
   
@@ -26,10 +27,16 @@ GameRules DetermineGameRule(LinkedList* ground, Player* player, Card* ground_car
   if(ground_card != NULL) {
     if(card->value == 0 && ground_card->value == 0) {
       if(card->type == ground_card->type) {
+	if(ground_count == 1) {
+	  return Basra;
+	}
 	return TwoCardsMatch;
       }
     }
     else if(card->value == ground_card->value) {
+      if(ground_count == 1) {
+	return Basra;
+      }
       return TwoCardsMatch;
     }
   }
@@ -46,6 +53,15 @@ void GetGameRuleName(int player_turn, GameRules rule, char* out) {
       }
       else {
         strncpy(out, "Computer will take all cards", strlen("Computer will take all cards"));
+      }
+    }
+    break;
+    case Basra: {
+      if(player_turn == 0) {
+        strncpy(out, "You won a Basra +10", strlen("You won a Basra +10"));
+      }
+      else {
+        strncpy(out, "Computer won a Basra +10", strlen("Computer won a Basra +10"));
       }
     }
     break;

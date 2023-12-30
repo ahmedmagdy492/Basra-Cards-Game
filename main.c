@@ -23,6 +23,7 @@ uint8_t show_dialog = 0;
 uint8_t is_playing = 0;
 uint8_t is_dimmed = 0;
 uint8_t current_player = 0;
+uint8_t someone_won = 0;
 uint32_t frames_counter = 0;
 Card *cur_selected_card = NULL;
 GameRules cur_play_rule = GameRuleNone;
@@ -77,8 +78,8 @@ void DrawGameText()
   }
 
   // drawing pocket count
-  DrawTextEx(font, TextFormat("your pocket: %i", CalcMyPocket(&player1)), (Vector2){10, HEIGHT - 40}, 40, 0, WHITE);
-  DrawTextEx(font, TextFormat("Com pocket: %i, Cards Left: %i", CalcMyPocket(&computer), CountLL(&computer.cur_set)), (Vector2){(WIDTH / 2 - 150), 10}, 40, 0, WHITE);
+  DrawTextEx(font, TextFormat("your pocket: %i", StackCountWithBasra(&player1.pocket)), (Vector2){10, HEIGHT - 40}, 40, 0, WHITE);
+  DrawTextEx(font, TextFormat("Com pocket: %i, Cards Left: %i", StackCountWithBasra(&computer.pocket), CountLL(&computer.cur_set)), (Vector2){(WIDTH / 2 - 150), 10}, 40, 0, WHITE);
 }
 
 // handling ground staff
@@ -175,13 +176,17 @@ void PerformAction(GameRules game_rule)
 
   switch (game_rule)
   {
+  case Basra:
   case TwoCardsMatch:
   {
     printf("Player No %d: Two Cards Match\n", current_player);
     printf("Remove from my curset\n");
+    if(game_rule == Basra) {
+      printf("Basra won\n");
+      cur_selected_card->is_basra = 1;
+    }
     RemoveFromLL(&player->cur_set, cur_selected_card);
     Card* matching_card = FindAMatchFromGround(&ground, cur_selected_card);
-    printf("Remove from my ground\n");
     printf("matching card ptr = %p, selected card ptr = %p\n", matching_card, cur_selected_card);
     RemoveFromLL(&ground, matching_card);
     Push(&player->pocket, cur_selected_card);
@@ -200,6 +205,10 @@ void PerformAction(GameRules game_rule)
   }
   break;
   }
+}
+
+int GetWhoWon() {
+  return StackCountWithBasra(&player1.pocket) > StackCountWithBasra(&computer.pocket) ? 0 : 1;
 }
 
 #define SWITCH_PLAYER() (current_player = current_player == 0 ? 1 : 0)
@@ -297,6 +306,7 @@ int main()
           cards_to_show_no = 1;
           GetGameRuleName(current_player, cur_play_rule, text_to_show);
           show_dialog = 1;
+	  is_dimmed = 1;
         }
       }
     }
@@ -325,9 +335,19 @@ int main()
 	  DistributeCards(&pile, &player1, &computer);
 	}
       }
-      else {
-	// TODO: Game should end here
-	
+      else if(StackCount(&pile) == 0 && CountLL(&player1.cur_set) == 0 && CountLL(&computer.cur_set) == 0) {
+        cards_to_show_no = 0;
+	memset(text_to_show, 0, 100);
+	int who_won = GetWhoWon();
+	if(who_won == 0) {
+	  strncpy(text_to_show, "Congrats You Won", strlen("Congrats You Won"));
+	}
+	else {
+	  strncpy(text_to_show, "Computer Won", strlen("Computer Won"));
+	}
+        show_dialog = 1;
+	is_dimmed = 1;
+	someone_won = 1;
       }
     }
 

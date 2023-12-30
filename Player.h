@@ -21,12 +21,6 @@ void DrawPlayerCards(Player* this) {
   }
 }
 
-int CalcMyPocket(Player* this) {
-  int total = StackCount(&this->pocket);
-  total += this->basra_count*10;
-  return total;
-}
-
 void DistributeCards(Stack* pile, Player* player1, Player* computer) {
   int i = 0;
   for(; i < 4; ++i) {

@@ -35,3 +35,19 @@ int StackCount(Stack* this) {
     return 0;
   return this->top;
 }
+
+int StackCountWithBasra(Stack* this) {
+  if((this->top-1) < 0)
+    return 0;
+  int i = this->top, total = 0;
+  for(; i >= 0; --i) {
+    if(this->cards[i] != NULL && this->cards[i]->is_basra == 1) {
+      total += 10;
+    }
+    else {
+      total++;
+    }
+  }
+  
+  return total;
+}

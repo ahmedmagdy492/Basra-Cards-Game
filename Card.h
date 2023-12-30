@@ -16,7 +16,8 @@ struct Card {
   CardType type;
   Image img;
   Texture texture;
-  int selected;
+  uint8_t selected;
+  uint8_t is_basra;
   int x;
   int y;
   int width;
@@ -60,6 +61,7 @@ typedef struct Card Card;
 
 Card* CreateCard(uint8_t value, CardType type) {
   Card* card = (Card*)malloc(sizeof(Card));
+  card->is_basra = 0;
   card->x = 0;
   card->y = 0;
   card->value = value;
