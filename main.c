@@ -27,6 +27,7 @@ uint8_t someone_won = 0;
 uint32_t frames_counter = 0;
 Card *cur_selected_card = NULL;
 GameRules cur_play_rule = GameRuleNone;
+ScreenMode cur_mode = MenuScreen;
 
 Player player1, computer;
 Stack pile;
@@ -98,8 +99,13 @@ void DrawGroundCards()
     Card *card = ptr->card;
     if (card != NULL)
     {
-      card->x = i * card->width + GROUND_X_START;
-      card->y = GROUND_X_START;
+      int x = i * card->width + GROUND_X_START, y = GROUND_X_START;
+      if((x+card->width) >= WIDTH) {
+	x = GROUND_X_START;
+	y += card->height+5;
+      }	 
+      card->x = x;
+      card->y = y;
       DrawCard(card);
       ++i;
     }
@@ -230,6 +236,8 @@ int main()
   EndDrawing();
   
   Sound sound = LoadSound("resources/sound/gameplay.ogg");
+  Image logo = LoadImage("resources/logo.png");
+  Texture logo_texture = LoadTextureFromImage(logo);
 
   Init();
 
@@ -239,131 +247,174 @@ int main()
 
   while (!WindowShouldClose())
   {
-    BeginDrawing();
-    ClearBackground(DARKGREEN);
+    if(cur_mode == PlayScreen) {
+      BeginDrawing();
+      ClearBackground(DARKGREEN);
 
-    if(!IsSoundPlaying(sound)) {
-      PlaySound(sound);
-    }
-
-    if (is_playing)
-    {
-      DrawGroundBG();
-      DrawGroundCards();
-      DrawGameText();
-      DrawPlayerCards(&player1);
-
-      if (IsKeyPressed(KEY_ESCAPE))
-      {
-        CloseDialog();
+      if(!IsSoundPlaying(sound)) {
+	PlaySound(sound);
       }
 
-      if (!is_dimmed)
-      {
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
-          if (current_player == 0)
-          {
-            int from_ground = 0;
-            Vector2 mouse_pos = GetMousePosition();
-            Card *card = GetClickedCard(&mouse_pos, &from_ground);
+      if (is_playing)
+	{
+	  DrawGroundBG();
+	  DrawGroundCards();
+	  DrawGameText();
+	  DrawPlayerCards(&player1);
 
-            if (!from_ground && card != NULL)
-            {
-              if (cur_selected_card != card)
-              {
-                card->selected = 1;
-                if (cur_selected_card != NULL) {
-                  cur_selected_card->selected = 0;
-                }
-                cur_selected_card = card;
-              }
-              else
-              {
-                Card *ground_card = FindAMatchFromGround(&ground, card);
-                cur_play_rule = DetermineGameRule(&ground, &player1, ground_card, card);
-                cards_to_show[0] = cur_selected_card;
-                cards_to_show_no = 1;
-                GetGameRuleName(current_player, cur_play_rule, text_to_show);
-                show_dialog = 1;
-                is_dimmed = 1;
-              }
-            }
-          }
-        }
-      }
+	  if (IsKeyPressed(KEY_ESCAPE))
+	    {
+	      CloseDialog();
+	    }
 
-      if (current_player == 1) // computer's turn
-      {
-        Card *card = GetBestCard(&computer);
-        if (CountLL(&computer.cur_set) > 0)
-        {
-	  Card* matching_card = FindAMatchFromGround(&ground, card);
-          cur_play_rule = DetermineGameRule(&ground, &computer, matching_card, card);
-          cur_selected_card = card;
+	  if (!is_dimmed)
+	    {
+	      if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+		{
+		  if (current_player == 0)
+		    {
+		      int from_ground = 0;
+		      Vector2 mouse_pos = GetMousePosition();
+		      Card *card = GetClickedCard(&mouse_pos, &from_ground);
 
-          cards_to_show[0] = card;
-          cards_to_show_no = 1;
-          GetGameRuleName(current_player, cur_play_rule, text_to_show);
-          show_dialog = 1;
+		      if (!from_ground && card != NULL)
+			{
+			  if (cur_selected_card != card)
+			    {
+			      card->selected = 1;
+			      if (cur_selected_card != NULL) {
+				cur_selected_card->selected = 0;
+			      }
+			      cur_selected_card = card;
+			    }
+			  else
+			    {
+			      Card *ground_card = FindAMatchFromGround(&ground, card);
+			      cur_play_rule = DetermineGameRule(&ground, &player1, ground_card, card);
+			      cards_to_show[0] = cur_selected_card;
+			      cards_to_show_no = 1;
+			      GetGameRuleName(current_player, cur_play_rule, text_to_show);
+			      show_dialog = 1;
+			      is_dimmed = 1;
+			    }
+			}
+		    }
+		}
+	    }
+
+	  if (current_player == 1) // computer's turn
+	    {
+	      Card *card = GetBestCard(&computer);
+	      if (CountLL(&computer.cur_set) > 0)
+		{
+		  Card* matching_card = FindAMatchFromGround(&ground, card);
+		  cur_play_rule = DetermineGameRule(&ground, &computer, matching_card, card);
+		  cur_selected_card = card;
+
+		  cards_to_show[0] = card;
+		  cards_to_show_no = 1;
+		  GetGameRuleName(current_player, cur_play_rule, text_to_show);
+		  show_dialog = 1;
+		  is_dimmed = 1;
+		}
+	    }
+	}
+
+      if (show_dialog)
+	{
+	  DrawFullScreenDialog();
+
+	  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+	    {
+	      if (IsOkDialogButtonClicked())
+		{
+		  CloseDialog();
+		  PerformAction(cur_play_rule);
+		  SWITCH_PLAYER();
+		}
+	    }
+	}
+      else {
+	// check if the both players card sets are empty
+	if(StackCount(&pile) > 0) {
+	  if(CountLL(&player1.cur_set) == 0 && CountLL(&computer.cur_set) == 0) {
+	    // TODO: ensure that the left in the pile is enough for each player
+	    // TODO: distribute 4 cards for each player
+	    printf("Distributing cards to players...\n");
+	    DistributeCards(&pile, &player1, &computer);
+	  }
+	}
+	else if(StackCount(&pile) == 0 && CountLL(&player1.cur_set) == 0 && CountLL(&computer.cur_set) == 0) {
+	  cards_to_show_no = 0;
+	  memset(text_to_show, 0, 100);
+	  int who_won = GetWhoWon();
+	  if(who_won == 0) {
+	    strncpy(text_to_show, "Congrats You Won", strlen("Congrats You Won"));
+	  }
+	  else {
+	    strncpy(text_to_show, "Computer Won", strlen("Computer Won"));
+	  }
+	  show_dialog = 1;
 	  is_dimmed = 1;
-        }
-      }
-    }
-
-    if (show_dialog)
-    {
-      DrawFullScreenDialog();
-
-      if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-      {
-        if (IsOkDialogButtonClicked())
-        {
-          CloseDialog();
-          PerformAction(cur_play_rule);
-          SWITCH_PLAYER();
-        }
-      }
-    }
-    else {
-      // check if the both players card sets are empty
-      if(StackCount(&pile) > 0) {
-	if(CountLL(&player1.cur_set) == 0 && CountLL(&computer.cur_set) == 0) {
-	  // TODO: ensure that the left in the pile is enough for each player
-	  // TODO: distribute 4 cards for each player
-	  printf("Distributing cards to players...\n");
-	  DistributeCards(&pile, &player1, &computer);
+	  someone_won = 1;
+	  cur_mode = MenuScreen;
 	}
       }
-      else if(StackCount(&pile) == 0 && CountLL(&player1.cur_set) == 0 && CountLL(&computer.cur_set) == 0) {
-        cards_to_show_no = 0;
-	memset(text_to_show, 0, 100);
-	int who_won = GetWhoWon();
-	if(who_won == 0) {
-	  strncpy(text_to_show, "Congrats You Won", strlen("Congrats You Won"));
-	}
-	else {
-	  strncpy(text_to_show, "Computer Won", strlen("Computer Won"));
-	}
-        show_dialog = 1;
-	is_dimmed = 1;
-	someone_won = 1;
+
+      EndDrawing();
+
+      if(frames_counter < INT_MAX) {
+	++frames_counter;
+      }
+      else {
+	frames_counter = 0;
       }
     }
+    else if(cur_mode == MenuScreen) {
+      BeginDrawing();
+      ClearBackground(BLACK);
 
-    EndDrawing();
+      DrawTexture(logo_texture, (WIDTH-logo_texture.width)/2, 80, WHITE);
 
-    if(frames_counter < INT_MAX) {
-      ++frames_counter;
+      Vector2 size1 = MeasureTextEx(font, "Start Game", 40, 0);
+      int y1 = (HEIGHT-size1.y)/2+20;
+      Vector2 pos1 = (Vector2){(WIDTH-(size1.x+40))/2, y1};
+      DrawGenericButton("Start Game", pos1, &font);
+      Vector2 size2 = MeasureTextEx(font, "How To Play", 40, 0);
+      int y2 = y1+size1.y+60;
+      Vector2 pos2 = (Vector2){(WIDTH-(size2.x+40))/2, y2};
+      DrawGenericButton("How to Play", pos2, &font);
+      Vector2 size3 = MeasureTextEx(font, "Exit", 40, 0);
+      Vector2 pos3 = (Vector2){(WIDTH-(size3.x+40))/2, y2+size2.y+60};
+      DrawGenericButton("Exit", pos3, &font);
+
+      Vector2 dim1 = (Vector2){size1.x+40, 40};
+      Vector2 dim2 = (Vector2){size2.x+40, 40};
+      Vector2 dim3 = (Vector2){size3.x+40, 40};
+
+      if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+	if(IsButtonClicked(&pos1, &dim1)) {
+	  // change mode to play and start the game
+	  cur_mode = PlayScreen;
+	}
+	else if(IsButtonClicked(&pos2, &dim2)) {
+	  // TODO: show how to play screen
+	}
+	else if(IsButtonClicked(&pos3, &dim3)) {
+	  // just exiting the game
+	  break;
+	}
+      }
+      
+      EndDrawing();
     }
-    else {
-      frames_counter = 0;
-    }
-  
   }
 
   CleanupLL(&ground);
   CleanThePile(&pile);
+
+  UnloadImage(logo);
+  UnloadTexture(logo_texture);
 
   UnloadSound(sound);
   UnloadFont(font);

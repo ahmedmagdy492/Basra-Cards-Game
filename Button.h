@@ -10,6 +10,21 @@ void DrawOkDialogButton(Font* font) {
   DrawTextEx(*font, "OK", (Vector2){btn_x+20, btn_y+20}, 40, 0, BLACK);
 }
 
+void DrawGenericButton(char* text, Vector2 pos, Font* font) {
+  Vector2 size = MeasureTextEx(*font, text, 40, 0);
+  DrawRectangle(pos.x, pos.y, size.x+40, 60+20, WHITE);
+  DrawTextEx(*font, text, (Vector2){pos.x+20, pos.y+20}, 40, 0, BLACK);
+}
+
+int IsButtonClicked(Vector2 *btn_pos, Vector2 *dim) {
+  Vector2 mouse_pos = GetMousePosition();
+  if((mouse_pos.x >= btn_pos->x && mouse_pos.x < (btn_pos->x + dim->x)) && (mouse_pos.y >= btn_pos->y && mouse_pos.y < (btn_pos->y + dim->y))) {
+    return 1;
+  }
+  
+  return 0;
+}
+
 int IsOkDialogButtonClicked() {
   Vector2 size = MeasureTextEx(GetFontDefault(), "OK", 40, 0);
   Vector2 mouse_pos = GetMousePosition();

@@ -1,5 +1,12 @@
 #pragma once
 
+enum ScreenMode {
+  MenuScreen,
+  PlayScreen
+};
+
+typedef enum ScreenMode ScreenMode;
+
 static void reverse(char str[], int length) {
     int start = 0;
     int end = length - 1;
