@@ -6,3 +6,9 @@
     <li>The main goal of each player should be to gather as many cards as they could, because at the end whoever has the most will win</li>
     <li>so each player tries to use some of the techinques provided by the game to win more cards faster</li>
 </ul>
+<h3>Usage:</h3>
+<ol>
+    <li>Install raylib first</li>
+    <li>run make on the terminal</li>
+    <li>run the executable from the build folder</li>
+</ol>
