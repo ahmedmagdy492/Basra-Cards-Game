@@ -81,6 +81,7 @@ void DrawGameText()
   // drawing pocket count
   DrawTextEx(font, TextFormat("your pocket: %i", StackCountWithBasra(&player1.pocket)), (Vector2){10, HEIGHT - 40}, 40, 0, WHITE);
   DrawTextEx(font, TextFormat("Com pocket: %i, Cards Left: %i", StackCountWithBasra(&computer.pocket), CountLL(&computer.cur_set)), (Vector2){(WIDTH / 2 - 150), 10}, 40, 0, WHITE);
+  DrawTextEx(font, TextFormat("Pile Cards: %i", StackCount(&pile)), (Vector2){20, GROUND_X_START+GROUND_H+80}, 40, 0, WHITE);  
 }
 
 // handling ground staff
