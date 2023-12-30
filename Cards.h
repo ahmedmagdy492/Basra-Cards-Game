@@ -37,7 +37,6 @@ LinkedList ground = {0};
 int cards_to_show_no = 1;
 Card *cards_to_show[3];
 char text_to_show[100];
-Font font;
 void DrawFullScreenDialog()
 {
   DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){0, 0, 0, 200});
@@ -51,10 +50,10 @@ void DrawFullScreenDialog()
     }
   }
 
-  Vector2 size = MeasureTextEx(font, text_to_show, 60, 0);
-  DrawTextEx(font, text_to_show, (Vector2){(WIDTH - size.x) / 2, (HEIGHT - 60) / 2}, 60, 0, WHITE);
+  Vector2 size = MeasureTextEx(GetFontDefault(), text_to_show, 60, 0);
+  DrawText(text_to_show, (WIDTH - size.x) / 2, (HEIGHT - 60) / 2, 60, WHITE);
 
-  DrawOkDialogButton(&font);
+  DrawOkDialogButton();
 }
 void CloseDialog()
 {
@@ -68,24 +67,24 @@ void DrawGameText()
   if (current_player == 0)
   {
     // player1
-    DrawTextEx(font, "Turn: Player1", (Vector2){5, 5}, 40, 0, WHITE);
+    DrawText("Turn: Player1", 5, 5, 20, WHITE);
   }
   else
   {
     // computer
-    DrawTextEx(font, "Turn: Computer", (Vector2){5, 5}, 40, 0, WHITE);
+    DrawText("Turn: Computer", 5, 5, 20, WHITE);
   }
 
   // drawing pocket count
-  DrawTextEx(font, TextFormat("your pocket: %i", CalcMyPocket(&player1)), (Vector2){10, HEIGHT - 40}, 40, 0, WHITE);
-  DrawTextEx(font, TextFormat("Com pocket: %i, Cards Left: %i", CalcMyPocket(&computer), CountLL(&computer.cur_set)), (Vector2){(WIDTH / 2 - 150), 10}, 40, 0, WHITE);
+  DrawText(TextFormat("your pocket: %i", CalcMyPocket(&player1)), 10, HEIGHT - 30, 20, WHITE);
+  DrawText(TextFormat("Com pocket: %i, Cards Left: %i", CalcMyPocket(&computer), CountLL(&computer.cur_set)), (WIDTH / 2 - 150), 10, 20, WHITE);
 }
 
 // handling ground staff
 void DrawGroundBG()
 {
   DrawRectangleLines(0, GROUND_X_START, WIDTH, HEIGHT - 200 - GROUND_X_START, WHITE);
-  DrawTextEx(font, "Ground", (Vector2){WIDTH / 2 - 40, HEIGHT / 2 - 30}, 40, 0, WHITE);
+  DrawText("Ground", WIDTH / 2 - 40, HEIGHT / 2 - 30, 30, WHITE);
 }
 
 void DrawGroundCards()
@@ -177,12 +176,6 @@ void PerformAction(GameRules game_rule)
   {
   case TwoCardsMatch:
   {
-    printf("Player No %d: Two Cards Match\n", current_player);
-    RemoveFromLL(&player->cur_set, cur_selected_card);
-    Card* matching_card = FindAMatchFromGround(&ground, cur_selected_card);
-    RemoveFromLL(&ground, matching_card);
-    Push(&player->pocket, cur_selected_card);
-    Push(&player->pocket, matching_card);
   }
   break;
   case TakeAllGroundCards:
@@ -205,27 +198,16 @@ int main()
 {
   InitWindow(WIDTH, HEIGHT, GAME_NAME);
 
-  InitAudioDevice();
-
-  font = LoadFont("resources/fonts/OleoScriptBold-1eRg.ttf");
-  Sound sound = LoadSound("resources/sound/gameplay.ogg");
-
   SetTargetFPS(60);
 
   Init();
 
   SetExitKey(0);
 
-  PlaySound(sound);
-
   while (!WindowShouldClose())
   {
     BeginDrawing();
     ClearBackground(DARKGREEN);
-
-    if(!IsSoundPlaying(sound)) {
-      PlaySound(sound);
-    }
 
     if (is_playing)
     {
@@ -279,8 +261,7 @@ int main()
         Card *card = GetBestCard(&computer);
         if (CountLL(&computer.cur_set) > 0)
         {
-	  Card* matching_card = FindAMatchFromGround(&ground, card);
-          cur_play_rule = DetermineGameRule(&ground, &computer, matching_card, card);
+          cur_play_rule = DetermineGameRule(&ground, &computer, 0, card);
           cur_selected_card = card;
 
           cards_to_show[0] = card;
@@ -317,7 +298,6 @@ int main()
       }
       else {
 	// TODO: Game should end here
-	
       }
     }
 
@@ -334,11 +314,6 @@ int main()
 
   CleanupLL(&ground);
   CleanThePile(&pile);
-
-  UnloadSound(sound);
-  UnloadFont(font);
-
-  CloseAudioDevice();
 
   CloseWindow();
   return 0;

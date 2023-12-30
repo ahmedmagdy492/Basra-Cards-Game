@@ -49,6 +49,15 @@ void GetGameRuleName(int player_turn, GameRules rule, char* out) {
       }
     }
     break;
+    case TwoCardsMatch: {
+      if(player_turn == 0) {
+        strncpy(out, "found a match for your card", strlen("found a match for your card"));
+      }
+      else {
+        strncpy(out, "Computer found a match for his card", strlen("Computer found a match for his card"));
+      }
+    }
+    break;
     case NoMatch: {
       if(player_turn == 0) {
         strncpy(out, "you will play this card", strlen("you will play this card"));

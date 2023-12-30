@@ -3,6 +3,8 @@
 #include <stdint.h>
 
 #define CARD_NAME_LEN 100
+#define CWIDTH 150
+#define CHEIGHT 150
 
 // hint: jack -> boy
 typedef enum {

@@ -3,11 +3,11 @@
 #include <raylib.h>
 #include "constants.h"
 
-void DrawOkDialogButton() {
-  Vector2 size = MeasureTextEx(GetFontDefault(), "OK", 40, 0);
+void DrawOkDialogButton(Font* font) {
+  Vector2 size = MeasureTextEx(*font, "OK", 40, 0);
   int btn_x = (WIDTH-size.x)/2, btn_y = HEIGHT-100;
   DrawRectangle(btn_x, btn_y, size.x+40, 60+20, WHITE);
-  DrawText("OK", btn_x+20, btn_y+20, 40, BLACK);
+  DrawTextEx(*font, "OK", (Vector2){btn_x+20, btn_y+20}, 40, 0, BLACK);
 }
 
 int IsOkDialogButtonClicked() {

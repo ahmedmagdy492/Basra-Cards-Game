@@ -11,5 +11,5 @@ const int CARD_H = 315;
 
 const int GROUND_W = WIDTH;
 const int GROUND_H = HEIGHT - (CARD_H + 5);
-const int GROUND_X_START = 30;
+const int GROUND_X_START = 40;
 const int GROUND_Y_END = 20;
