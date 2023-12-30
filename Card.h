@@ -81,7 +81,7 @@ void DrawCard(Card* card) {
     DrawTexture(card->texture, card->x, card->y, WHITE);
   }
   else {
-    DrawTexture(card->texture, card->x, card->y, CLITERAL(Color){ 255, 255, 255, 128 });
+    DrawTexture(card->texture, card->x, card->y, CLITERAL(Color){ 255, 255, 255, 200 });
   }
 }
 

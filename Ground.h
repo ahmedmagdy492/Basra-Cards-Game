@@ -5,10 +5,10 @@ Card* FindAMatchFromGround(LinkedList* this, Card* card) {
 
   while(ptr != NULL) {
     if(card->value == 0 && ptr->card->value == 0 && card->type == ptr->card->type) {
-      return card;
+      return ptr->card;
     }
-    else if(card->value == ptr->card->value) {
-      return card;
+    else if(card->value == ptr->card->value && card->value != 0) {
+      return ptr->card;
     }
     ptr = ptr->next;
   }

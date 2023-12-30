@@ -178,8 +178,11 @@ void PerformAction(GameRules game_rule)
   case TwoCardsMatch:
   {
     printf("Player No %d: Two Cards Match\n", current_player);
+    printf("Remove from my curset\n");
     RemoveFromLL(&player->cur_set, cur_selected_card);
     Card* matching_card = FindAMatchFromGround(&ground, cur_selected_card);
+    printf("Remove from my ground\n");
+    printf("matching card ptr = %p, selected card ptr = %p\n", matching_card, cur_selected_card);
     RemoveFromLL(&ground, matching_card);
     Push(&player->pocket, cur_selected_card);
     Push(&player->pocket, matching_card);
@@ -207,10 +210,17 @@ int main()
 
   InitAudioDevice();
 
-  font = LoadFont("resources/fonts/OleoScriptBold-1eRg.ttf");
-  Sound sound = LoadSound("resources/sound/gameplay.ogg");
-
   SetTargetFPS(60);
+
+  font = LoadFont("resources/fonts/OleoScriptBold-1eRg.ttf");
+
+  // loading screen
+  BeginDrawing();
+  Vector2 loading_txt_size = MeasureTextEx(font, "Loading...", 40, 0);
+  DrawTextEx(font, "Loading...", (Vector2){(WIDTH-loading_txt_size.x)/2, (HEIGHT-loading_txt_size.y)/2}, 40, 0, WHITE);
+  EndDrawing();
+  
+  Sound sound = LoadSound("resources/sound/gameplay.ogg");
 
   Init();
 

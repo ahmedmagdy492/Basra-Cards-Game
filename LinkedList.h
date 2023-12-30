@@ -58,25 +58,30 @@ void RemoveLastFromLL(LinkedList* this) {
 
 void RemoveFromLL(LinkedList* this, Card* card) {
   if(this->head != NULL) {
-    Node* ptr = this->head;
+    Node* ptr = this->head, *prev = NULL;
     while(ptr != NULL) {
       if(ptr->card == card) {
 	if(this->head == this->tail) {
+	  printf("in head = tail\n");
 	  this->head = this->tail = NULL;
 	}
 	else if(ptr == this->tail) {
+	  printf("in ptr = tail\n");
 	  this->tail = ptr->prev;
 	  this->tail->next = NULL;
 	}
 	else if(ptr == this->head) {
+	  printf("in ptr = head\n");
 	  this->head = ptr->next;
 	}
 	else {
-	  ptr->prev->next = ptr->next;
-	  ptr->next->prev = ptr->prev;
+	  printf("Coming Card = %d, LL Card = %d\n", card->value, ptr->card->value);
+	  prev->next = ptr->next;
+	  ptr->next->prev = prev;
 	}
 	break;
       }
+      prev = ptr;
       ptr = ptr->next;
     }
   }
