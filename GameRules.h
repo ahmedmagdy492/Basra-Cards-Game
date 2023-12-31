@@ -97,5 +97,7 @@ void TakeAllCards(LinkedList* ground, Player* player, Card* card) {
     ptr = ptr->next;
   }
   // remove the card from the player's cur_set
-  RemoveFromLL(&player->cur_set, card);
+  if(card != NULL) {
+    RemoveFromLL(&player->cur_set, card);
+  }
 }

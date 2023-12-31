@@ -1,6 +1,6 @@
 #pragma once
 
-#define GAME_NAME "Basra Cards"
+#define GAME_NAME "Basra - Cards Game"
 #define GROUND_LEN 12
 #define NCARDS 52
 

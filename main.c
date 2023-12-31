@@ -229,7 +229,28 @@ void PerformAction(GameRules game_rule)
 }
 
 int GetWhoWon() {
-  return StackCountWithBasra(&player1.pocket) > StackCountWithBasra(&computer.pocket) ? 0 : 1;
+  if(CountLL(&ground) > 0) {
+    if(current_player == 0) {
+      // pass null for card to remove from player because it's the end of the game
+      TakeAllCards(&ground, &player1, NULL);
+    }
+    else {
+      TakeAllCards(&ground, &computer, NULL);
+    }
+  }
+  
+  int player1_count = StackCountWithBasra(&player1.pocket);
+  int computer_count = StackCountWithBasra(&computer.pocket);
+
+  if(player1_count > computer_count) {
+    return 0;
+  }
+  else if(computer_count > player1_count) {
+    return 1;
+  }
+
+  // draw
+  return 2;
 }
 
 #define SWITCH_PLAYER() (current_player = current_player == 0 ? 1 : 0)
@@ -373,8 +394,11 @@ int main()
 	  if(who_won == 0) {
 	    strncpy(text_to_show, "Congrats You Won", strlen("Congrats You Won"));
 	  }
-	  else {
+	  else if(who_won == 1) {
 	    strncpy(text_to_show, "Computer Won", strlen("Computer Won"));
+	  }
+	  else {
+	    strncpy(text_to_show, "Draw", strlen("Draw"));
 	  }
 	  show_dialog = 1;
 	  is_dimmed = 1;
