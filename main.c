@@ -230,12 +230,13 @@ void PerformAction(GameRules game_rule)
 
 int GetWhoWon() {
   if(CountLL(&ground) > 0) {
+    // NOTE: switching players order because the turn has already been switched when reached this point
     if(current_player == 0) {
       // pass null for card to remove from player because it's the end of the game
-      TakeAllCards(&ground, &player1, NULL);
+      TakeAllCards(&ground, &computer, NULL);
     }
     else {
-      TakeAllCards(&ground, &computer, NULL);
+      TakeAllCards(&ground, &player1, NULL);
     }
   }
   
