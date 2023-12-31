@@ -141,6 +141,20 @@ void Init()
   current_player = 0;
 }
 
+// have an issue
+void SetGameBackToInitialState() {
+  show_dialog = 0;
+  is_playing = 0;
+  is_dimmed = 0;
+  current_player = 0;
+  someone_won = 0;
+  cur_selected_card = NULL;
+  cur_play_rule = GameRuleNone;
+  frames_counter = 0;
+  CleanupLL(&ground);
+  Init();
+}
+
 Card *GetClickedCard(Vector2 *mouse_pos, int *from_ground)
 {
   Card *card = NULL;
@@ -264,9 +278,9 @@ int main()
 	  DrawPlayerCards(&player1);
 
 	  if (IsKeyPressed(KEY_ESCAPE))
-	    {
-	      CloseDialog();
-	    }
+	  {
+	    CloseDialog();
+	  }
 
 	  if (!is_dimmed)
 	    {
@@ -322,19 +336,26 @@ int main()
 	}
 
       if (show_dialog)
-	{
+      {
 	  DrawFullScreenDialog();
 
 	  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+	  {
+	    if (IsOkDialogButtonClicked())
 	    {
-	      if (IsOkDialogButtonClicked())
-		{
-		  CloseDialog();
-		  PerformAction(cur_play_rule);
-		  SWITCH_PLAYER();
-		}
+	      if(someone_won == 1) {
+		// TODO: set the game to its initial state
+		cur_mode = MenuScreen;
+		SetGameBackToInitialState();
+	      }
+	      else {
+		CloseDialog();
+		PerformAction(cur_play_rule);
+		SWITCH_PLAYER();
+	      }
 	    }
-	}
+	  }
+      }
       else {
 	// check if the both players card sets are empty
 	if(StackCount(&pile) > 0) {
@@ -358,7 +379,6 @@ int main()
 	  show_dialog = 1;
 	  is_dimmed = 1;
 	  someone_won = 1;
-	  cur_mode = MenuScreen;
 	}
       }
 
