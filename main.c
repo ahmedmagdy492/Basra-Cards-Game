@@ -462,9 +462,9 @@ int main()
       Vector2 pos3 = (Vector2){(WIDTH - (size3.x + 40)) / 2, y2 + size2.y + 60};
       DrawGenericButton("Exit", pos3, &font);
 
-      Vector2 dim1 = (Vector2){size1.x + 40, 40};
-      Vector2 dim2 = (Vector2){size2.x + 40, 40};
-      Vector2 dim3 = (Vector2){size3.x + 40, 40};
+      Vector2 dim1 = (Vector2){size1.x + 40, 80};
+      Vector2 dim2 = (Vector2){size2.x + 40, 80};
+      Vector2 dim3 = (Vector2){size3.x + 40, 80};
 
       if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
       {
@@ -475,7 +475,7 @@ int main()
         }
         else if (IsButtonClicked(&pos2, &dim2))
         {
-          // TODO: show how to play screen
+          // show how to play screen
           cur_mode = HowToPlayScreen;
         }
         else if (IsButtonClicked(&pos3, &dim3))
