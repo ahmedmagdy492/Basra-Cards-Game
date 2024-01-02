@@ -2,7 +2,8 @@
 
 enum ScreenMode {
   MenuScreen,
-  PlayScreen
+  PlayScreen,
+  HowToPlayScreen
 };
 
 typedef enum ScreenMode ScreenMode;
