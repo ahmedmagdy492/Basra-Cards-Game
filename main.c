@@ -142,23 +142,14 @@ void Init()
     AppendToLL(&ground, card);
   }
 
-  game_flags.is_playing = 1;
-  current_player = 0;
-}
-
-// have an issue
-void SetGameBackToInitialState()
-{
+  cur_play_rule = GameRuleNone;
   game_flags.show_dialog = 0;
   game_flags.is_playing = 0;
   game_flags.is_dimmed = 0;
-  current_player = 0;
   game_flags.someone_won = 0;
-  cur_selected_card = NULL;
-  cur_play_rule = GameRuleNone;
   frames_counter = 0;
-  CleanupLL(&ground);
-  Init();
+  game_flags.is_playing = 1;
+  current_player = 0;
 }
 
 Card *GetClickedCard(Vector2 *mouse_pos, int *from_ground)
@@ -316,7 +307,12 @@ int main()
 
         if (IsKeyPressed(KEY_ESCAPE))
         {
-          CloseDialog();
+          if(game_flags.show_dialog == 1) {
+            CloseDialog();
+          }
+          else {
+            cur_mode = PauseScreen;
+          }
         }
 
         if (!game_flags.is_dimmed)
@@ -385,7 +381,7 @@ int main()
             {
               // TODO: set the game to its initial state
               cur_mode = MenuScreen;
-              SetGameBackToInitialState();
+              Init();
             }
             else
             {
@@ -505,6 +501,20 @@ int main()
 
       if(IsKeyPressed(KEY_ESCAPE)) {
         cur_mode = MenuScreen;
+      }
+
+      EndDrawing();
+    }
+    else if(cur_mode == PauseScreen) {
+      BeginDrawing();
+      ClearBackground(BLACK);
+
+      Vector2 size = MeasureTextEx(font, "Pause", 50, 0);
+      DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){0,0,0, 128});
+      DrawTextEx(font, "Pause", (Vector2){(GetScreenWidth()-size.x)/2, (GetScreenHeight()-size.y)/2}, 50, 0, WHITE);
+
+      if(IsKeyPressed(KEY_ESCAPE)) {
+        cur_mode = PlayScreen;
       }
 
       EndDrawing();
