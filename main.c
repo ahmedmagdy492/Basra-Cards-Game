@@ -74,17 +74,17 @@ void DrawGameText()
   if (current_player == 0)
   {
     // player1
-    DrawTextEx(font, "Turn: Player1", (Vector2){5, 5}, 40, 0, WHITE);
+    DrawTextEx(font, "Turn: Player1", (Vector2){5, 5}, 30, 0, WHITE);
   }
   else
   {
     // computer
-    DrawTextEx(font, "Turn: Computer", (Vector2){5, 5}, 40, 0, WHITE);
+    DrawTextEx(font, "Turn: Computer", (Vector2){5, 5}, 30, 0, WHITE);
   }
 
   // drawing pocket count
   DrawTextEx(font, TextFormat("your pocket: %i", StackCountWithBasra(&player1.pocket)), (Vector2){10, HEIGHT - 40}, 40, 0, WHITE);
-  DrawTextEx(font, TextFormat("Com pocket: %i, Cards Left: %i", StackCountWithBasra(&computer.pocket), CountLL(&computer.cur_set)), (Vector2){(WIDTH / 2 - 150), 10}, 40, 0, WHITE);
+  DrawTextEx(font, TextFormat("Com pocket: %i, Cards Left: %i", StackCountWithBasra(&computer.pocket), CountLL(&computer.cur_set)), (Vector2){(WIDTH / 2 - 150), 10}, 30, 0, WHITE);
   DrawTextEx(font, TextFormat("Pile Cards: %i", StackCount(&pile)), (Vector2){20, GROUND_X_START + GROUND_H + 80}, 40, 0, WHITE);
 }
 
@@ -268,7 +268,7 @@ int main()
 
   SetTargetFPS(60);
 
-  font = LoadFont("resources/fonts/OleoScriptBold-1eRg.ttf");
+  font = LoadFontEx("resources/fonts/OleoScript-nj4P.ttf", 40, NULL, 0);
 
   // loading screen
   BeginDrawing();
