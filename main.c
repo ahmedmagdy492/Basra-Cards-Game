@@ -32,6 +32,7 @@ uint32_t frames_counter = 0;
 Card *cur_selected_card = NULL;
 GameRules cur_play_rule = GameRuleNone;
 ScreenMode cur_mode = MenuScreen;
+ComputerPlayMode cur_computer_playmode = EasyMode;
 
 Player player1, computer;
 Stack pile;
@@ -353,7 +354,7 @@ int main()
 
         if (current_player == 1) // computer's turn
         {
-          Card *card = GetBestCard(&computer);
+          Card *card = GetBestCard(&computer, cur_computer_playmode);
           if (CountLL(&computer.cur_set) > 0)
           {
             Card *matching_card = FindAMatchFromGround(&ground, card);
@@ -446,35 +447,50 @@ int main()
 
       DrawTexture(logo_texture, (WIDTH - logo_texture.width) / 2, 80, WHITE);
 
-      Vector2 size1 = MeasureTextEx(font, "Start Game", 40, 0);
+      Vector2 size1 = MeasureTextEx(font, "Start Game - Easy", 40, 0);
       int y1 = (HEIGHT - size1.y) / 2 + 20;
       Vector2 pos1 = (Vector2){(WIDTH - (size1.x + 40)) / 2, y1};
-      DrawGenericButton("Start Game", pos1, &font);
-      Vector2 size2 = MeasureTextEx(font, "How To Play", 40, 0);
-      int y2 = y1 + size1.y + 60;
+      DrawGenericButton("Start Game - Easy", pos1, &font);
+      
+      Vector2 size2 = MeasureTextEx(font, "Start Game - Hard", 40, 0);
+      int y2 = y1 + size2.y + 60;
       Vector2 pos2 = (Vector2){(WIDTH - (size2.x + 40)) / 2, y2};
-      DrawGenericButton("How to Play", pos2, &font);
-      Vector2 size3 = MeasureTextEx(font, "Exit", 40, 0);
-      Vector2 pos3 = (Vector2){(WIDTH - (size3.x + 40)) / 2, y2 + size2.y + 60};
-      DrawGenericButton("Exit", pos3, &font);
+      DrawGenericButton("Start Game - Hard", pos2, &font);
+      
+      Vector2 size3 = MeasureTextEx(font, "How To Play", 40, 0);
+      int y3 = y2 + size3.y + 60;
+      Vector2 pos3 = (Vector2){(WIDTH - (size3.x + 40)) / 2, y3};
+      DrawGenericButton("How to Play", pos3, &font);
+      
+      Vector2 size4 = MeasureTextEx(font, "Exit", 40, 0);
+      Vector2 pos4 = (Vector2){(WIDTH - (size4.x + 40)) / 2, y3 + size4.y + 60};
+      DrawGenericButton("Exit", pos4, &font);
 
       Vector2 dim1 = (Vector2){size1.x + 40, 80};
       Vector2 dim2 = (Vector2){size2.x + 40, 80};
       Vector2 dim3 = (Vector2){size3.x + 40, 80};
+      Vector2 dim4 = (Vector2){size4.x + 40, 80};
 
       if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
       {
         if (IsButtonClicked(&pos1, &dim1))
         {
           // change mode to play and start the game
+	  cur_computer_playmode = EasyMode;
+	  printf("Easy Mode Selected\n");
           cur_mode = PlayScreen;
         }
-        else if (IsButtonClicked(&pos2, &dim2))
+	else if(IsButtonClicked(&pos2, &dim2)) {
+	  cur_computer_playmode = HardMode;
+	  printf("Hard Mode Selected\n");
+	  cur_mode = PlayScreen;
+	}
+        else if (IsButtonClicked(&pos3, &dim3))
         {
           // show how to play screen
           cur_mode = HowToPlayScreen;
         }
-        else if (IsButtonClicked(&pos3, &dim3))
+        else if (IsButtonClicked(&pos4, &dim4))
         {
           // just exiting the game
           break;
