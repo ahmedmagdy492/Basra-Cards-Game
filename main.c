@@ -225,6 +225,17 @@ void PerformAction(GameRules game_rule)
     AppendToLL(&ground, cur_selected_card);
   }
   break;
+  case SumMatch:
+  {
+    RemoveFromLL(&player->cur_set, cur_selected_card);
+    Push(&player->pocket, cur_selected_card);
+    int i = 0;
+    for(; i < cards_to_show_no; ++i) {
+      RemoveFromLL(&ground, cards_to_show[i]);
+      Push(&player->pocket, cards_to_show[i]);
+    }
+  }
+  break;
   }
 }
 
@@ -365,10 +376,27 @@ int main(int argc, char** argv)
                 }
                 else
                 {
-                  Card *ground_card = FindAMatchFromGround(&ground, card);
-                  cur_play_rule = DetermineGameRule(&ground, &player1, ground_card, card);
-                  cards_to_show[0] = cur_selected_card;
-                  cards_to_show_no = 1;
+                  if(IsJackOr7Diamond(cur_selected_card)) {
+                    cur_play_rule = TakeAllGroundCards;
+                    cards_to_show_no = 1;
+                    cards_to_show[0] = cur_selected_card;
+                  }
+                  else {
+                    cards_to_show_no = FindMatchingCardsFromGround(&ground, card, cards_to_show);
+
+                    if(cards_to_show_no == 0) {
+                      // did not find any sum matching
+                      Card *ground_card = FindAMatchFromGround(&ground, card);
+                      cur_play_rule = DetermineGameRule(&ground, &player1, ground_card, card);
+                      cards_to_show[0] = cur_selected_card;
+                      cards_to_show_no = 1;
+                    }
+                    else {
+                      // found some sum matching
+                      cur_play_rule = SumMatch;
+                    }
+                  }
+
                   GetGameRuleName(current_player, cur_play_rule, text_to_show);
                   game_flags.show_dialog = 1;
                   game_flags.is_dimmed = 1;
@@ -383,12 +411,19 @@ int main(int argc, char** argv)
           Card *card = GetBestCard(&computer, cur_computer_playmode, &ground);
           if (CountLL(&computer.cur_set) > 0)
           {
-            Card *matching_card = FindAMatchFromGround(&ground, card);
-            cur_play_rule = DetermineGameRule(&ground, &computer, matching_card, card);
             cur_selected_card = card;
+            if(IsJackOr7Diamond(cur_selected_card)) {
+              cur_play_rule = TakeAllGroundCards;
+              cards_to_show_no = 1;
+              cards_to_show[0] = cur_selected_card;
+            }
+            else {
+              Card *matching_card = FindAMatchFromGround(&ground, card);
+              cur_play_rule = DetermineGameRule(&ground, &computer, matching_card, card);
+              cards_to_show[0] = card;
+              cards_to_show_no = 1;
+            }
 
-            cards_to_show[0] = card;
-            cards_to_show_no = 1;
             GetGameRuleName(current_player, cur_play_rule, text_to_show);
             game_flags.show_dialog = 1;
             game_flags.is_dimmed = 1;

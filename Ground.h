@@ -15,3 +15,30 @@ Card* FindAMatchFromGround(LinkedList* this, Card* card) {
 
   return NULL;
 }
+
+int FindMatchingCardsFromGround(LinkedList* ground, Card* clicked_card, Card** sum_cards) {
+  if(ground->head == NULL) {
+    return 0;
+  }
+
+  Node* first = ground->head;
+  Node* second = ground->head->next;
+  int counter = 0;
+
+  while(first != NULL) {
+    second = first->next;
+    while(second != NULL) {
+      if(first->card->value != 0 && second->card->value != 0) {
+        if((first->card->value + second->card->value) == clicked_card->value) {
+          sum_cards[counter++] = first->card;
+          sum_cards[counter++] = second->card;
+          return counter;
+        }
+      }
+      second = second->next;
+    }
+    first = first->next;
+  }
+
+  return 0;
+}
