@@ -25,6 +25,7 @@ struct
   unsigned int is_playing : 1;
   unsigned int is_dimmed : 1;
   unsigned int someone_won : 1;
+  unsigned int debug_mode: 1;
 } game_flags;
 
 uint8_t current_player = 0;
@@ -261,8 +262,20 @@ int GetWhoWon()
 
 #define SWITCH_PLAYER() (current_player = current_player == 0 ? 1 : 0)
 
-int main()
+int main(int argc, char** argv)
 {
+  if(argc == 2) {
+    if(strncmp(argv[1], "--debug-mode", strlen("--debug-mode")) == 0) {
+      game_flags.debug_mode = 1;
+    }
+    else {
+      game_flags.debug_mode = 0;
+    }
+  }
+  else {
+    game_flags.debug_mode = 0;
+  }
+
   InitWindow(WIDTH, HEIGHT, GAME_NAME);
 
   InitAudioDevice();
@@ -291,6 +304,19 @@ int main()
   {
     if (cur_mode == PlayScreen)
     {
+      if(game_flags.debug_mode == 1) {
+        if(IsKeyPressed(KEY_BACKSPACE)) {
+          Node* com_set = computer.cur_set.head;
+
+          printf("Computer Current Cards Set\n");
+          printf("===============================\n");
+          while(com_set != NULL) {
+            printf("Card Value: %d, Card Type: %d\n", com_set->card->value, com_set->card->type);
+            com_set = com_set->next;
+          }
+        }
+      }
+
       BeginDrawing();
       ClearBackground(DARKGREEN);
 
@@ -354,7 +380,7 @@ int main()
 
         if (current_player == 1) // computer's turn
         {
-          Card *card = GetBestCard(&computer, cur_computer_playmode);
+          Card *card = GetBestCard(&computer, cur_computer_playmode, &ground);
           if (CountLL(&computer.cur_set) > 0)
           {
             Card *matching_card = FindAMatchFromGround(&ground, card);
