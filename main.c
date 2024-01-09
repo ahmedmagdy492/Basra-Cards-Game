@@ -87,7 +87,7 @@ void DrawGameText()
   // drawing pocket count
   DrawTextEx(font, TextFormat("your pocket: %i", StackCountWithBasra(&player1.pocket)), (Vector2){10, HEIGHT - 40}, 40, 0, WHITE);
   DrawTextEx(font, TextFormat("Com pocket: %i, Cards Left: %i, Difficulty: %s", StackCountWithBasra(&computer.pocket), CountLL(&computer.cur_set), (cur_computer_playmode == HardMode) ? "Hard" : "Easy"), (Vector2){(WIDTH / 2 - 150), 10}, 30, 0, WHITE);
-  DrawTextEx(font, TextFormat("Pile Cards: %i", StackCount(&pile)), (Vector2){20, GROUND_X_START + GROUND_H + 80}, 40, 0, WHITE);
+  DrawTextEx(font, TextFormat("Pile Cards: %i", StackCount(&pile)), (Vector2){10, GROUND_X_START + (HEIGHT-200) + 80}, 40, 0, WHITE);
 }
 
 // handling ground staff
@@ -199,16 +199,13 @@ void PerformAction(GameRules game_rule)
   case Basra:
   case TwoCardsMatch:
   {
-    printf("Player No %d: Two Cards Match\n", current_player);
-    printf("Remove from my curset\n");
     if (game_rule == Basra)
     {
-      printf("Basra won\n");
       cur_selected_card->is_basra = 1;
     }
     RemoveFromLL(&player->cur_set, cur_selected_card);
     Card *matching_card = FindAMatchFromGround(&ground, cur_selected_card);
-    printf("matching card ptr = %p, selected card ptr = %p\n", matching_card, cur_selected_card);
+    
     RemoveFromLL(&ground, matching_card);
     Push(&player->pocket, cur_selected_card);
     Push(&player->pocket, matching_card);
@@ -289,6 +286,12 @@ int main(int argc, char** argv)
 
   InitWindow(WIDTH, HEIGHT, GAME_NAME);
 
+  int display = GetCurrentMonitor();
+  WIDTH = GetMonitorWidth(display);
+  HEIGHT = GetMonitorHeight(display);
+  SetWindowSize(WIDTH, HEIGHT);
+  ToggleFullscreen();
+
   InitAudioDevice();
 
   SetTargetFPS(60);
@@ -297,8 +300,8 @@ int main(int argc, char** argv)
 
   // loading screen
   BeginDrawing();
-  Vector2 loading_txt_size = MeasureTextEx(font, "Loading...", 40, 0);
-  DrawTextEx(font, "Loading...", (Vector2){(WIDTH - loading_txt_size.x) / 2, (HEIGHT - loading_txt_size.y) / 2}, 40, 0, WHITE);
+  Vector2 loading_txt_size = MeasureTextEx(font, "Ahmed Magdy", 40, 0);
+  DrawTextEx(font, "Ahmed Magdy", (Vector2){(WIDTH - loading_txt_size.x) / 2, (HEIGHT - loading_txt_size.y) / 2}, 40, 0, WHITE);
   EndDrawing();
 
   Sound sound = LoadSound("resources/sound/gameplay.ogg");
@@ -461,9 +464,6 @@ int main(int argc, char** argv)
         {
           if (CountLL(&player1.cur_set) == 0 && CountLL(&computer.cur_set) == 0)
           {
-            // TODO: ensure that the left in the pile is enough for each player
-            // TODO: distribute 4 cards for each player
-            printf("Distributing cards to players...\n");
             DistributeCards(&pile, &player1, &computer);
           }
         }
@@ -538,12 +538,10 @@ int main(int argc, char** argv)
         {
           // change mode to play and start the game
 	  cur_computer_playmode = EasyMode;
-	  printf("Easy Mode Selected\n");
           cur_mode = PlayScreen;
         }
 	else if(IsButtonClicked(&pos2, &dim2)) {
 	  cur_computer_playmode = HardMode;
-	  printf("Hard Mode Selected\n");
 	  cur_mode = PlayScreen;
 	}
         else if (IsButtonClicked(&pos3, &dim3))
@@ -586,12 +584,16 @@ int main(int argc, char** argv)
       BeginDrawing();
       ClearBackground(BLACK);
 
-      Vector2 size = MeasureTextEx(font, "Pause", 50, 0);
+      Vector2 size = MeasureTextEx(font, "Pause, Press Q to back to main menu", 50, 0);
       DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){0,0,0, 128});
-      DrawTextEx(font, "Pause", (Vector2){(GetScreenWidth()-size.x)/2, (GetScreenHeight()-size.y)/2}, 50, 0, WHITE);
+      DrawTextEx(font, "Pause, Press Q to back to main menu", (Vector2){(WIDTH-size.x)/2, (HEIGHT-size.y)/2}, 50, 0, WHITE);
 
       if(IsKeyPressed(KEY_ESCAPE)) {
         cur_mode = PlayScreen;
+      }
+
+      if(IsKeyPressed(KEY_Q)) {
+	cur_mode = MenuScreen;
       }
 
       EndDrawing();

@@ -19,11 +19,11 @@ Card* GetBestCard(Player* player, ComputerPlayMode play_mode, LinkedList* ground
   }
 
   while(ptr != NULL) {
-    if(ptr->card->value == 7 && ptr->card->type == diamond) {
+    if(ptr->card->value == 7 && ptr->card->type == diamond && CountLL(ground) > 0) {
       return ptr->card;
     }
     else if(ptr->card->value == 0) {
-      if(ptr->card->type == jack) {
+      if(ptr->card->type == jack && CountLL(ground) > 0) {
         return ptr->card;
       }
     }

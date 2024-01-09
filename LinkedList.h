@@ -62,20 +62,16 @@ void RemoveFromLL(LinkedList* this, Card* card) {
     while(ptr != NULL) {
       if(ptr->card == card) {
 	if(this->head == this->tail) {
-	  printf("in head = tail\n");
 	  this->head = this->tail = NULL;
 	}
 	else if(ptr == this->tail) {
-	  printf("in ptr = tail\n");
 	  this->tail = ptr->prev;
 	  this->tail->next = NULL;
 	}
 	else if(ptr == this->head) {
-	  printf("in ptr = head\n");
 	  this->head = ptr->next;
 	}
 	else {
-	  printf("Coming Card = %d, LL Card = %d\n", card->value, ptr->card->value);
 	  prev->next = ptr->next;
 	  ptr->next->prev = prev;
 	}
