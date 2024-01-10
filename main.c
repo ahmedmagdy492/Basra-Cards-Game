@@ -421,10 +421,18 @@ int main(int argc, char** argv)
               cards_to_show[0] = cur_selected_card;
             }
             else {
-              Card *matching_card = FindAMatchFromGround(&ground, card);
-              cur_play_rule = DetermineGameRule(&ground, &computer, matching_card, card);
-              cards_to_show[0] = card;
-              cards_to_show_no = 1;
+	      cards_to_show_no = FindMatchingCardsFromGround(&ground, cur_selected_card, cards_to_show);
+
+	      if(cards_to_show_no == 0) {
+		Card *matching_card = FindAMatchFromGround(&ground, card);
+		cur_play_rule = DetermineGameRule(&ground, &computer, matching_card, card);
+		cards_to_show[0] = card;
+		cards_to_show_no = 1;
+	      }
+	      else {
+		cur_play_rule = SumMatch;
+		cards_to_show[cards_to_show_no++] = cur_selected_card;
+	      }
             }
 
             GetGameRuleName(current_player, cur_play_rule, text_to_show);
@@ -474,11 +482,11 @@ int main(int argc, char** argv)
           int who_won = GetWhoWon();
           if (who_won == 0)
           {
-            strncpy(text_to_show, "Congrats You Won", strlen("Congrats You Won"));
+            strncpy(text_to_show, TextFormat("You Won, Com: %i, You: %i", StackCountWithBasra(&computer.pocket), StackCountWithBasra(&player1.pocket)), strlen(TextFormat("You Won, Com: %i, You: %i", StackCountWithBasra(&computer.pocket), StackCountWithBasra(&player1.pocket))));
           }
           else if (who_won == 1)
           {
-            strncpy(text_to_show, "Computer Won", strlen("Computer Won"));
+            strncpy(text_to_show, TextFormat("Computer Won, Com: %i, You: %i", StackCountWithBasra(&computer.pocket), StackCountWithBasra(&player1.pocket)), strlen(TextFormat("Computer Won, Com: %i, You: %i", StackCountWithBasra(&computer.pocket), StackCountWithBasra(&player1.pocket))));
           }
           else
           {
